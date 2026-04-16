@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Metrics{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Model Metrics</h2>
+    </div>
+    <span class="badge bg-primary px-3 py-2">Best Model: {{ metrics.get('champion_model', 'Pending')|replace('_', ' ')|title }}</span>
+</div>
+
+<div class="row g-4 mb-4">
+    {% for name, score in metrics.get('scores', {}).items() %}
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <h3 class="fw-bold mb-3">{{ name|replace('_', ' ')|title }}</h3>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="metric-box">
+                        <small>Accuracy</small>
+                        <h4>{{ (score.accuracy * 100)|round(2) }}%</h4>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-box">
+                        <small>Precision</small>
+                        <h4>{{ (score.precision * 100)|round(2) }}%</h4>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-box">
+                        <small>Recall</small>
+                        <h4>{{ (score.recall * 100)|round(2) }}%</h4>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-box">
+                        <small>F1-Score</small>
+                        <h4>{{ (score.f1_score * 100)|round(2) }}%</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="panel-card">
+    <h3 class="fw-bold mb-3">Confusion Matrix</h3>
+    {% if confusion_matrix_exists %}
+    <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" alt="Confusion Matrix" class="img-fluid rounded-4 border">
+    {% else %}
+    <p class="text-muted mb-0">Confusion matrix will appear after training finishes.</p>
+    {% endif %}
+</div>
+{% endblock %}

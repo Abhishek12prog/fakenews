@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Admin Predictions{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">All Predictions</h2>
+    </div>
+    <a href="{{ url_for('admin_overview') }}" class="btn btn-outline-primary">Back to Admin Home</a>
+</div>
+
+<div class="panel-card">
+    {% if predictions %}
+    <div class="history-list">
+        {% for item in predictions %}
+        <div class="history-item">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge {% if item.prediction == 'REAL' %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ item.prediction }}
+                </span>
+                <small class="text-muted">{{ item.user.full_name }} • {{ item.created_at.strftime('%d %b %Y %H:%M') }}</small>
+            </div>
+            <p class="mb-2">{{ item.input_text }}</p>
+            <small class="text-muted">Model: {{ item.selected_model.replace('_', ' ')|title }} | Confidence: {{ item.confidence }}% | Logistic Regression: {{ item.logistic_probability }}% | Naive Bayes: {{ item.naive_bayes_probability }}%</small>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No predictions available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

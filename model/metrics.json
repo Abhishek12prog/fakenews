@@ -1,0 +1,38 @@
+{
+  "dataset_size": 20,
+  "training_samples": 16,
+  "testing_samples": 4,
+  "champion_model": "naive_bayes",
+  "scores": {
+    "logistic_regression": {
+      "accuracy": 0.5,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667
+    },
+    "naive_bayes": {
+      "accuracy": 0.75,
+      "precision": 0.6667,
+      "recall": 1.0,
+      "f1_score": 0.8
+    },
+    "linear_svm": {
+      "accuracy": 0.5,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667
+    },
+    "passive_aggressive": {
+      "accuracy": 0.5,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667
+    },
+    "sgd_classifier": {
+      "accuracy": 0.5,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1_score": 0.6667
+    }
+  }
+}

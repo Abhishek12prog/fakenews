@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Admin Users{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Manage Users</h2>
+    </div>
+    <a href="{{ url_for('admin_overview') }}" class="btn btn-outline-primary">Back to Admin Home</a>
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge {% if user.is_admin %}bg-dark{% else %}bg-secondary{% endif %}">
+                            {{ 'Admin' if user.is_admin else 'User' }}
+                        </span>
+                    </td>
+                    <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if not user.is_admin %}
+                        <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">Protected</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

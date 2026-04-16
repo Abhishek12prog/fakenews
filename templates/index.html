@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Home | Fake News Detection{% endblock %}
+{% block content %}
+<section class="hero-section rounded-4 p-4 p-lg-5 mb-5">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold">Fake News Detection</h1>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Check News</a>
+                <a href="{{ url_for('history') }}" class="btn btn-outline-primary btn-lg">View History</a>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="stats-grid">
+                <div class="glass-card">
+                    <h3>{{ (metrics.get('scores', {}).get(metrics.get('champion_model', ''), {}).get('accuracy', 0) * 100)|round(2) }}%</h3>
+                    <p>Best Model Accuracy</p>
+                </div>
+                <div class="glass-card">
+                    <h3>{{ metrics.get('champion_model', 'Pending')|replace('_', ' ')|title }}</h3>
+                    <p>Champion Model</p>
+                </div>
+                <div class="glass-card">
+                    <h3>{{ metrics.get('dataset_size', 'N/A') }}</h3>
+                    <p>Dataset Records</p>
+                </div>
+                <div class="glass-card">
+                    <h3>{{ history_count }}</h3>
+                    <p>Your Saved Predictions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-md-4">
+        <a href="{{ url_for('dashboard') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>Prediction Page</h4>
+            <p class="mb-0 text-muted">Check News</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('history') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>History Page</h4>
+            <p class="mb-0 text-muted">View History</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('metrics_page') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>Metrics Page</h4>
+            <p class="mb-0 text-muted">Model Metrics</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('dashboard') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>Smart NLP Pipeline</h4>
+            <p class="mb-0 text-muted">TF-IDF • LR • NB</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('dashboard') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>Interactive Dashboard</h4>
+            <p class="mb-0 text-muted">Results • Graph</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('admin_overview') if current_user and current_user.is_admin else url_for('dashboard') }}" class="feature-card feature-link h-100 d-block text-decoration-none">
+            <h4>Admin Controls</h4>
+            <p class="mb-0 text-muted">{% if current_user and current_user.is_admin %}Admin Dashboard{% else %}Admin Access{% endif %}</p>
+        </a>
+    </div>
+</section>
+
+{% if latest_prediction %}
+<section class="mt-5">
+    <div class="panel-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">Latest Prediction</h3>
+            <span class="badge {% if latest_prediction.prediction == 'REAL' %}bg-success{% else %}bg-danger{% endif %}">
+                {{ latest_prediction.prediction }}
+            </span>
+        </div>
+        <p class="mb-2">{{ latest_prediction.input_text[:220] }}{% if latest_prediction.input_text|length > 220 %}...{% endif %}</p>
+        <small class="text-muted">Confidence: {{ latest_prediction.confidence }}% • {{ latest_prediction.created_at.strftime('%d %b %Y %H:%M') }}</small>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

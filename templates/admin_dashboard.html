@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Admin Dashboard</h2>
+    </div>
+    <span class="badge bg-primary px-3 py-2">Champion: {{ metrics.get('champion_model', 'Pending')|replace('_', ' ')|title }}</span>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="metric-box h-100">
+            <small>Total Users</small>
+            <h4>{{ users|length }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-box h-100">
+            <small>Total Predictions</small>
+            <h4>{{ predictions|length }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-box h-100">
+            <small>Accuracy</small>
+            <h4>{{ (metrics.get('scores', {}).get(metrics.get('champion_model', ''), {}).get('accuracy', 0) * 100)|round(2) }}%</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-box h-100">
+            <small>Dataset Size</small>
+            <h4>{{ metrics.get('dataset_size', 0) }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="panel-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold mb-0">Registered Users</h3>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-primary">Open Full Users Page</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.full_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge {% if user.is_admin %}bg-dark{% else %}bg-secondary{% endif %}">
+                                    {{ 'Admin' if user.is_admin else 'User' }}
+                                </span>
+                            </td>
+                            <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+                            <td>
+                                {% if not user.is_admin %}
+                                <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">Protected</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="panel-card mb-4">
+            <h3 class="fw-bold mb-3">Confusion Matrix</h3>
+            {% if confusion_matrix_exists %}
+            <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" alt="Confusion Matrix" class="img-fluid rounded-4 border">
+            {% else %}
+            <p class="text-muted mb-0">Train the model to generate the confusion matrix image.</p>
+            {% endif %}
+        </div>
+
+        <div class="panel-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold mb-0">Latest Predictions</h3>
+                <a href="{{ url_for('admin_predictions') }}" class="btn btn-sm btn-outline-primary">Open Full Predictions Page</a>
+            </div>
+            <div class="prediction-feed">
+                {% for item in predictions %}
+                <div class="history-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge {% if item.prediction == 'REAL' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ item.prediction }}
+                        </span>
+                        <small class="text-muted">{{ item.user.full_name }}</small>
+                    </div>
+                    <p class="mb-2">{{ item.input_text[:120] }}{% if item.input_text|length > 120 %}...{% endif %}</p>
+                    <small class="text-muted">Confidence: {{ item.confidence }}%</small>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No predictions recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
