@@ -8,8 +8,7 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, ses
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from model.train_model import ensure_model_artifacts, load_model_bundle, predict_news
-
+from model.train_model import load_model_bundle, predict_news
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_DIR = BASE_DIR / "database"
@@ -333,7 +332,6 @@ def save_prediction_history(user_id: int, text: str, result: dict) -> None:
 @app.route("/predict", methods=["POST"])
 @login_required
 def predict():
-    ensure_model_artifacts(base_dir=BASE_DIR)
     payload = request.get_json(silent=True) or {}
     news_text = payload.get("news_text") if payload else request.form.get("news_text", "")
     selected_model = payload.get("selected_model", "auto") if payload else request.form.get("selected_model", "auto")
@@ -386,9 +384,7 @@ def internal_error(error):
     db.session.rollback()
     return render_template("error.html", error_code=500, message="Something went wrong on the server."), 500
 
-
 def bootstrap_application():
-    ensure_model_artifacts(base_dir=BASE_DIR)
     with app.app_context():
         db.create_all()
         ensure_database_schema()
